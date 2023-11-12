@@ -7,11 +7,18 @@ import time
 from file_operations import perform_check
 from db import get_db_connection
 import sqlite3
+from socket_client import start_socket, connect_to_server, update_message
+
+
 
 def start_monitoring_thread(monitor_dir, dest_dir, output_text_callback, monitoring_flag):
     if not monitoring_flag["active"]:
         monitoring_flag["active"] = True
         output_text_callback("Monitoring started...\n")
+        sio = start_socket()
+        connect_to_server('http://localhost:8000', sio, output_text_callback)
+        output_text_callback("Socket open...\n")
+
         monitor_thread = threading.Thread(target=monitor_directory, args=(monitor_dir, dest_dir, output_text_callback, monitoring_flag))
         monitor_thread.daemon = True
         monitor_thread.start()
@@ -77,15 +84,19 @@ def open_database_view(db_file='verified_apk_data.db'):
 def create_gui(monitor_dir, dest_dir, monitoring_flag):
     root = tk.Tk()
     root.title("Directory Monitoring")
-    root.geometry("500x350")
+    root.geometry("800x800")
 
     output_text = scrolledtext.ScrolledText(root, height=15, width=60)
     output_text.pack(padx=10, pady=10)
 
+    # update_message(root, output_text_callback, "Hello World from socket emit!")
+        
     def output_text_callback(message):
         output_text.insert(tk.END, message)
         output_text.see(tk.END)
+        
 
+    
     button_frame = tk.Frame(root)
     button_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=10, pady=10)
 
@@ -103,11 +114,15 @@ def create_gui(monitor_dir, dest_dir, monitoring_flag):
     stop_button.pack(side=tk.LEFT, padx=10)
 
     def exit_app():
-        if monitoring_flag["active"]:
-            if messagebox.askyesno("Exit", "Monitoring is active. Are you sure you want to exit?"):
-                monitoring_flag["active"] = False
-                root.destroy()
-        else:
+        try:
+            if monitoring_flag["active"]:
+                if messagebox.askyesno("Exit", "Monitoring is active. Are you sure you want to exit?"):
+                    monitoring_flag["active"] = False
+                    root.destroy()
+            elif sio.connected:
+                print("Disconnecting from socket...")
+                sio.disconnect()
+        finally:
             root.destroy()
 
     exit_button = tk.Button(button_frame, text="Exit", command=exit_app)
