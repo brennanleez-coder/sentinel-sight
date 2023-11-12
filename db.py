@@ -12,14 +12,15 @@ def create_legit_apk_info_table(conn):
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS legit_apk_info_table (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                packageName TEXT NOT NULL,
-                apkHash TEXT,
-                versionCode TEXT,
-                versionNumber TEXT,
-                appCertHash TEXT,
+                package_name TEXT NOT NULL,
+                apk_hash TEXT,
+                version_code TEXT,
+                version_name TEXT,
+                app_cert_hash TEXT,
+                permissions TEXT,
                 createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (packageName) REFERENCES hash_checks(packageName)
+                FOREIGN KEY (package_name) REFERENCES hash_checks(packageName)
             )
         """)
         print("Table legit_apk_info_table created successfully.")

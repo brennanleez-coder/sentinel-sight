@@ -48,7 +48,7 @@ def extract_info(directory_of_tools, apk_file_path):
     
     # run apksigner to get the app cert hash
     command = ["apksigner", "verify", "--print-certs", apk_file_path]
-    result = subprocess.run(command, cwd=directory_of_aapt, stdout=subprocess.PIPE)
+    result = subprocess.run(command, cwd=directory_of_tools, stdout=subprocess.PIPE)
     output = result.stdout.decode()
     app_cert_hash = extract_app_cert_hash(output)
 
@@ -70,4 +70,4 @@ apk_file_path = '/Users/brennanlee/Desktop/extractedApks/Facebook_441.0.0.0.93_a
 # Location of tools: /Users/brennanlee/library/Android/sdk/build-tools/33.0.1
 # export PATH=$PATH:/Users/brennanlee/library/Android/sdk/build-tools/33.0.1
 
-print(extract_info(directory_of_tools, apk_file_path))
+# print(extract_info(directory_of_tools, apk_file_path))

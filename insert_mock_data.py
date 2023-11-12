@@ -1,8 +1,13 @@
-import sqlite3
+from hash_util import compute_sha256
 from datetime import datetime
+from extract_info_from_apk import extract_info
+import os
 
 # Assuming db.py contains the get_db_connection function
 from db import get_db_connection
+
+directory_of_local_apks = '/Users/brennanlee/Desktop/extractedApks/'
+directory_of_tools = '/Users/brennanlee/library/Android/sdk/build-tools/33.0.1/'
 
 def insert_mock_data_apk_info(conn):
     cursor = conn.cursor()
@@ -23,6 +28,29 @@ def insert_mock_data_apk_info(conn):
             """, data + (datetime.now(), datetime.now()))
 
     conn.commit()
+
+def insert_data_from_local_apk_directory(conn, directory_of_local_apks):
+    cursor = conn.cursor()
+    for filename in os.listdir(directory_of_local_apks):
+        if filename.endswith(".apk"):
+            apk_path = os.path.join(directory_of_local_apks, filename)
+            info = extract_info(directory_of_tools, apk_path)
+
+            # Extracting values
+            version_code, version_name, package_name, app_cert_hash, permissions = \
+            info['version_code'], info['version_name'], info['package_name'], info['app_cert_hash'], info['permissions']
+
+            apk_hash = compute_sha256(apk_path)
+
+            data = (package_name, apk_hash, version_code, version_name, app_cert_hash, permissions, datetime.now(), datetime.now())
+
+            # Execute the SQL command
+            cursor.execute("""
+                INSERT INTO legit_apk_info_table (package_name, apk_hash, version_code, version_name, app_cert_hash, permissions, createdAt, updatedAt)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, data)
+
+    
 
 def insert_mock_data_hash_checks(conn):
     cursor = conn.cursor()
@@ -46,7 +74,7 @@ def insert_mock_data_hash_checks(conn):
 
 def retrieve_data(conn):
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM hash_checks_table")
+    cursor.execute("SELECT * FROM legit_apk_info_table")
     rows = cursor.fetchall()
     return rows
 
@@ -55,9 +83,11 @@ def main():
     conn = get_db_connection(db_file)
     
     # Insert mock data
-    insert_mock_data_apk_info(conn)
-    print("Mock data inserted into apk_info_table successfully.")
+    # insert_mock_data_apk_info(conn)
+    # print("Mock data inserted into apk_info_table successfully.")
     
+    # Insert live apk data from local directory
+    insert_data_from_local_apk_directory(conn, directory_of_local_apks)
     insert_mock_data_hash_checks(conn)
     print("Mock data inserted into hash_checks_table successfully.")
     
