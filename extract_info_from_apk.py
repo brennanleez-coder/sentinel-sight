@@ -30,10 +30,16 @@ def extract_app_cert_hash(apksigner_output):
     return match.group(1) if match else None
 
 
-def extract_info(directory_of_aapt, apk_file_path):
+# params: directory of tools, apk file path
+# directory of tools is the location of aapt and apksigner
+# apk_file_path is the location of the apk file
+# return: json object of the extracted info
+def extract_info(directory_of_tools, apk_file_path):
+    
+    
     command = ["aapt", "dump", "badging", apk_file_path]
     # Run aapt to get the version info
-    result = subprocess.run(command, cwd=directory_of_aapt, stdout=subprocess.PIPE)
+    result = subprocess.run(command, cwd=directory_of_tools, stdout=subprocess.PIPE)
     output = result.stdout.decode()
     version_code = extract_version_code(output)
     version_name = extract_version_name(output)
@@ -57,10 +63,11 @@ def extract_info(directory_of_aapt, apk_file_path):
     return output
     
 # test extract_info
-directory_of_aapt = '/Users/brennanlee/library/Android/sdk/build-tools/33.0.1/'
+directory_of_tools = '/Users/brennanlee/library/Android/sdk/build-tools/33.0.1/'
 apk_file_path = '/Users/brennanlee/Desktop/extractedApks/Facebook_441.0.0.0.93_apkcombo.com.apk'
 
 # if does not run, add aapt and apksigner to PATH
 # Location of tools: /Users/brennanlee/library/Android/sdk/build-tools/33.0.1
 # export PATH=$PATH:/Users/brennanlee/library/Android/sdk/build-tools/33.0.1
-print(extract_info(directory_of_aapt, apk_file_path))
+
+print(extract_info(directory_of_tools, apk_file_path))
