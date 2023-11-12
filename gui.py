@@ -11,11 +11,11 @@ from socket_client import start_socket, connect_to_server, update_message
 
 
 
-def start_monitoring_thread(monitor_dir, dest_dir, output_text_callback, monitoring_flag):
+def start_monitoring_thread(sio, monitor_dir, dest_dir, output_text_callback, monitoring_flag):
     if not monitoring_flag["active"]:
         monitoring_flag["active"] = True
         output_text_callback("Monitoring started...\n")
-        sio = start_socket()
+        
         connect_to_server('http://localhost:8000', sio, output_text_callback)
         output_text_callback("Socket open...\n")
 
@@ -24,7 +24,7 @@ def start_monitoring_thread(monitor_dir, dest_dir, output_text_callback, monitor
         monitor_thread.start()
 
 def monitor_directory(monitor_dir, dest_dir, output_text_callback, monitoring_flag):
-    output_text_callback("Listener triggered\n")
+    output_text_callback("Listener triggered...\n")
     while monitoring_flag["active"]:
         perform_check(monitor_dir, dest_dir, output_text_callback)
         time.sleep(50)  # Check every 50 seconds
@@ -34,6 +34,7 @@ def open_database_view(db_file='verified_apk_data.db'):
     db_window = tk.Toplevel()
     db_window.title("Verified Apk Viewer")
     db_window.geometry("800x800")
+    
 
     # Create a frame for the Treeview and the scrollbars
     tree_frame = tk.Frame(db_window)
@@ -81,12 +82,12 @@ def open_database_view(db_file='verified_apk_data.db'):
     # Initially populate the Treeview
     populate_treeview()
 
-def create_gui(monitor_dir, dest_dir, monitoring_flag):
+def create_gui(sio, monitor_dir, dest_dir, monitoring_flag):
     root = tk.Tk()
     root.title("Directory Monitoring")
     root.geometry("800x800")
 
-    output_text = scrolledtext.ScrolledText(root, height=15, width=60)
+    output_text = scrolledtext.ScrolledText(root, height=30, width=60)
     output_text.pack(padx=10, pady=10)
 
     # update_message(root, output_text_callback, "Hello World from socket emit!")
@@ -100,7 +101,7 @@ def create_gui(monitor_dir, dest_dir, monitoring_flag):
     button_frame = tk.Frame(root)
     button_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=10, pady=10)
 
-    start_button = tk.Button(button_frame, text="Start Monitoring", command=lambda: start_monitoring_thread(monitor_dir, dest_dir, output_text_callback, monitoring_flag))
+    start_button = tk.Button(button_frame, text="Start Monitoring", command=lambda: start_monitoring_thread(sio, monitor_dir, dest_dir, output_text_callback, monitoring_flag))
     start_button.pack(side=tk.LEFT, padx=10)
 
     check_button = tk.Button(button_frame, text="Check Now", command=lambda: perform_check(monitor_dir, dest_dir, output_text_callback))
@@ -119,9 +120,9 @@ def create_gui(monitor_dir, dest_dir, monitoring_flag):
                 if messagebox.askyesno("Exit", "Monitoring is active. Are you sure you want to exit?"):
                     monitoring_flag["active"] = False
                     root.destroy()
-            elif sio.connected:
-                print("Disconnecting from socket...")
-                sio.disconnect()
+                if sio.connected:
+                    print("Disconnecting from socket...")
+                    sio.disconnect()
         finally:
             root.destroy()
 
