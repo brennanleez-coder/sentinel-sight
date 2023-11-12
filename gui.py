@@ -40,7 +40,7 @@ def open_database_view(db_file='verified_apk_data.db'):
     tree_frame = tk.Frame(db_window)
     tree_frame.pack(fill='both', expand=True)
 
-    columns = ("ID", "Package Name", "APK Hash", "Version Code", "Version Number", "Cert Hash", "Created At", "Updated At")
+    columns = ("ID", "Package Name", "APK Hash", "Version Code", "Version Number", "Cert Hash", "Permissions", "Created At", "Updated At")
     tree = ttk.Treeview(tree_frame, columns=columns, show='headings')
 
     v_scroll = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
