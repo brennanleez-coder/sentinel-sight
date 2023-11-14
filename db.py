@@ -3,7 +3,7 @@ import datetime
 
 def get_db_connection(db_file='verified_apk_data.db'):
     conn = sqlite3.connect(db_file)
-    conn.isolation_level = None  # This sets the connection to auto-commit mode
+    conn.isolation_level = None  # Sets connection to auto-commit mode
     return conn
 
 def create_legit_apk_info_table(conn):
@@ -40,20 +40,17 @@ def insert_into_legit_apk_info_table(conn, package_name, apk_hash="", version_co
             INSERT INTO legit_apk_info_table (package_name, apk_hash, version_code, 
                                              version_name, app_cert_hash, permissions, 
                                              createdAt, updatedAt)
-            VALUES (:package_name, :apk_hash, :version_code, 
-                    :version_name, :app_cert_hash, :permissions, 
-                    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            VALUES (?, ? ,?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             """,
-            {
-                'package_name': package_name,
-                'apk_hash': apk_hash,
-                'version_code': version_code,
-                'version_name': version_name,
-                'app_cert_hash': app_cert_hash,
-                'permissions': permissions
-            }
+            (
+                package_name,
+                apk_hash,
+                version_code,
+                version_name,
+                app_cert_hash,
+                permissions
+            )
         )
-        conn.commit()
         print("Data inserted successfully into legit_apk_info_table.")
     except sqlite3.Error as e:
         print(f"An error occurred while inserting data: {e}")
@@ -94,23 +91,19 @@ def insert_into_hash_checks_table(conn, package_name, incoming_hash="", download
                                            incoming_app_cert_hash, downloaded_app_cert_hash, 
                                            incoming_permissions, downloaded_permissions, result, 
                                            received_time, checked_time)
-            VALUES (:package_name, :incoming_hash, :downloaded_hash, 
-                    :incoming_app_cert_hash, :downloaded_app_cert_hash, 
-                    :incoming_permissions, :downloaded_permissions, :result, 
-                    CURRENT_TIMESTAMP, NULL)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, NULL)
             """,
             {
-                'package_name': package_name,
-                'incoming_hash': incoming_hash,
-                'downloaded_hash': downloaded_hash,
-                'incoming_app_cert_hash': incoming_app_cert_hash,
-                'downloaded_app_cert_hash': downloaded_app_cert_hash,
-                'incoming_permissions': incoming_permissions,
-                'downloaded_permissions': downloaded_permissions,
-                'result': result
+                package_name,
+                incoming_hash,
+                downloaded_hash,
+                incoming_app_cert_hash,
+                downloaded_app_cert_hash,
+                incoming_permissions,
+                downloaded_permissions,
+                result
             }
         )
-        conn.commit()
         print("Data inserted successfully into hash_checks_table.")
     except sqlite3.Error as e:
         print(f"An error occurred while inserting data: {e}")

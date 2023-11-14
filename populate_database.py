@@ -2,9 +2,7 @@ from hash_util import compute_sha256
 from datetime import datetime
 from extract_info_from_apk import extract_info
 import os
-
-# Assuming db.py contains the get_db_connection function
-from db import get_db_connection
+from db import get_db_connection, insert_into_legit_apk_info_table
 
 directory_of_local_apks = '/Users/brennanlee/Desktop/extractedApks/'
 directory_of_tools = '/Users/brennanlee/library/Android/sdk/build-tools/33.0.1/'
@@ -22,6 +20,7 @@ def insert_mock_data_apk_info(conn):
         ]
         
         for data in mock_data:
+            
             cursor.execute("""
                 INSERT INTO legit_apk_info_table (packageName, apkHash, versionCode, versionNumber, appCertHash, createdAt, updatedAt)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -45,11 +44,12 @@ def insert_data_from_local_apk_directory(conn, directory_of_local_apks):
 
                 data = (package_name, apk_hash, version_code, version_name, app_cert_hash, permissions, datetime.now(), datetime.now())
 
-                cursor.execute("""
-                    INSERT INTO legit_apk_info_table (package_name, apk_hash, version_code, version_name, app_cert_hash, permissions, createdAt, updatedAt)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """, data)
+                # cursor.execute("""
+                #     INSERT INTO legit_apk_info_table (package_name, apk_hash, version_code, version_name, app_cert_hash, permissions, createdAt, updatedAt)
+                #     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                # """, data)
                 
+                insert_into_legit_apk_info_table(conn, package_name, apk_hash, version_code, version_name, app_cert_hash, permissions)
                 print("Live apk data inserted successfully into legit_apk_info_table.")
 
                 
@@ -58,8 +58,6 @@ def insert_data_from_local_apk_directory(conn, directory_of_local_apks):
 
     
 
-from datetime import datetime
-import sqlite3
 
 def insert_mock_data_hash_checks(conn):
     try:
