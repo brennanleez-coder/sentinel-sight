@@ -7,7 +7,7 @@ import time
 from file_operations import perform_check
 from db import get_db_connection
 import sqlite3
-from socket_client import start_socket, connect_to_server, update_message
+from socket_client import connect_to_server
 
 
 
@@ -16,8 +16,12 @@ def start_monitoring_thread(sio, monitor_dir, dest_dir, output_text_callback, mo
         monitoring_flag["active"] = True
         output_text_callback("Monitoring started...\n")
         
-        connect_to_server('http://localhost:8000', sio, output_text_callback)
-        output_text_callback("Socket open...\n")
+        try:
+            connect_to_server('http://localhost:8000', sio, output_text_callback, monitoring_flag)
+            output_text_callback("Socket open...\n")
+        except Exception as e:
+            print(e)
+            output_text_callback(f"Error occured when connecting web socket: {e}")
 
         monitor_thread = threading.Thread(target=monitor_directory, args=(monitor_dir, dest_dir, output_text_callback, monitoring_flag))
         monitor_thread.daemon = True
@@ -79,7 +83,6 @@ def open_database_view(db_file='verified_apk_data.db'):
     refresh_button = tk.Button(db_window, text="Refresh", command=populate_treeview)
     refresh_button.pack(side='bottom', pady=10)
 
-    # Initially populate the Treeview
     populate_treeview()
 
 def create_gui(sio, monitor_dir, dest_dir, monitoring_flag):
@@ -89,8 +92,6 @@ def create_gui(sio, monitor_dir, dest_dir, monitoring_flag):
 
     output_text = scrolledtext.ScrolledText(root, height=30, width=60)
     output_text.pack(padx=10, pady=10)
-
-    # update_message(root, output_text_callback, "Hello World from socket emit!")
         
     def output_text_callback(message):
         output_text.insert(tk.END, message)
@@ -119,10 +120,12 @@ def create_gui(sio, monitor_dir, dest_dir, monitoring_flag):
             if monitoring_flag["active"]:
                 if messagebox.askyesno("Exit", "Monitoring is active. Are you sure you want to exit?"):
                     monitoring_flag["active"] = False
-                    root.destroy()
+                    
                 if sio.connected:
                     print("Disconnecting from socket...")
                     sio.disconnect()
+                
+                root.destroy()
         finally:
             root.destroy()
 

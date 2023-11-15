@@ -3,9 +3,15 @@ from datetime import datetime
 from extract_info_from_apk import extract_info
 import os
 from db import get_db_connection, insert_into_legit_apk_info_table
+import sqlite3
 
-directory_of_local_apks = '/Users/brennanlee/Desktop/extractedApks/'
-directory_of_tools = '/Users/brennanlee/library/Android/sdk/build-tools/33.0.1/'
+# macbook setup
+# directory_of_local_apks = '/Users/brennanlee/Desktop/extractedApks/'
+# directory_of_tools = '/Users/brennanlee/library/Android/sdk/build-tools/33.0.1/'
+
+# windows setup
+directory_of_tools = "C:\\Users\\Cyber\\AppData\\Local\\Android\\Sdk\\build-tools\\33.0.1"
+directory_of_local_apks = "C:\\Users\\Cyber\\Desktop\\extractedApks"
 
 def insert_mock_data_apk_info(conn):
     cursor = conn.cursor()

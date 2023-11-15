@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort
 from hash_util import compute_sha256
 import subprocess
 import os
@@ -18,21 +18,36 @@ socketio = SocketIO(app)
 
 @app.route("/")
 def hello():
-    socketio.emit('test', {'message': 'Hello World from socket emit!'})
+    socketio.emit('process_apk', {'message': 'Hello World from socket emit!'})
     return jsonify({"status": "success", "message": "Hello World!"})
 
 
 @app.route('/submit_apk', methods=['POST'])
 def submit_apk():
     data = request.json
+    if not data:
+        abort(400, description="No JSON data provided")
+    
     package_name = data['package_name']
     incoming_apk_hash = data['incoming_apk_hash']
     incoming_app_cert_hash = data['incoming_app_cert_hash']
     incoming_permissions = data['incoming_permissions']
     result = HashResult.UNCHECKED
+
+    if None in [package_name, incoming_apk_hash, incoming_app_cert_hash, incoming_permissions]:
+        return jsonify({"error": "Missing required fields"}), 400  # Bad Request
     
-        
-    return jsonify({"status": "success", "message": "Hash and package name received."})
+    socketio.emit('process_apk', {
+        'message': 'Hello World from socket emit!',
+        'incoming_apk_info': {
+        'package_name': package_name,
+        'apk_hash': incoming_apk_hash,
+        'app_cert_hash': incoming_app_cert_hash,
+        'permissions': incoming_permissions
+    }
+    })
+
+    return jsonify({"status": "success", "message": "information received successfully."}),200
 
 
 

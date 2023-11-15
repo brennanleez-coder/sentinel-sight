@@ -84,6 +84,7 @@ def insert_into_hash_checks_table(conn, package_name, incoming_hash="", download
                             incoming_app_cert_hash="", downloaded_app_cert_hash="", 
                             incoming_permissions="", downloaded_permissions="", result=""):
     try:
+        
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -93,7 +94,7 @@ def insert_into_hash_checks_table(conn, package_name, incoming_hash="", download
                                            received_time, checked_time)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, NULL)
             """,
-            {
+            (
                 package_name,
                 incoming_hash,
                 downloaded_hash,
@@ -102,7 +103,7 @@ def insert_into_hash_checks_table(conn, package_name, incoming_hash="", download
                 incoming_permissions,
                 downloaded_permissions,
                 result
-            }
+            )
         )
         print("Data inserted successfully into hash_checks_table.")
     except sqlite3.Error as e:
@@ -126,6 +127,5 @@ def test_db_connection(conn):
 conn = get_db_connection()
 create_legit_apk_info_table(conn)
 create_hash_checks_table(conn)
-
 test_db_connection(conn)
 conn.close()
