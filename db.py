@@ -84,7 +84,6 @@ def insert_into_hash_checks_table(conn, package_name, incoming_hash="", download
                             incoming_app_cert_hash="", downloaded_app_cert_hash="", 
                             incoming_permissions="", downloaded_permissions="", result=""):
     try:
-        
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -109,6 +108,34 @@ def insert_into_hash_checks_table(conn, package_name, incoming_hash="", download
     except sqlite3.Error as e:
         print(f"An error occurred while inserting data: {e}")
 
+def insert_incoming_data_into_hash_checks_table(conn,
+                                                package_name,
+                                                incoming_hash="", 
+                                                incoming_app_cert_hash="",
+                                                incoming_permissions="",
+                                                result=""):
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO hash_checks_table (package_name, incoming_hash, 
+                                           incoming_app_cert_hash, 
+                                           incoming_permissions, result, 
+                                           received_time, checked_time)
+            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, NULL)
+            """,
+            (
+                package_name,
+                incoming_hash,
+                incoming_app_cert_hash,
+                incoming_permissions,
+                result
+            )
+        )
+        print("Incoming data inserted successfully into hash_checks_table.")
+    except sqlite3.Error as e:
+        print(f"An error occurred while inserting data: {e}")
+
 def test_db_connection(conn):
     try:
         cursor = conn.cursor()
@@ -122,6 +149,14 @@ def test_db_connection(conn):
     except sqlite3.Error as e:
         print(f"An error occurred: {e}")
 
+def get_all_legit_apk_info(conn):
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM legit_apk_info_table")
+        rows = cursor.fetchall()
+        return rows
+    except sqlite3.Error as e:
+        print(f"An error occurred: {e}")
 
 # Usage
 conn = get_db_connection()

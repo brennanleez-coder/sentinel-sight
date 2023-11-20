@@ -3,9 +3,11 @@ import socketio
 import os
 from file_operations import perform_check
 from extract_info_from_apk import extract_info
+from db import insert_incoming_data_into_hash_checks_table,insert_into_hash_checks_table
+from hash_results import HashResult
 
 sio = socketio.Client()
-
+db_queue_manager = None
 
 
 
@@ -19,10 +21,14 @@ directory_of_local_apks = "C:\\Users\\Cyber\\Desktop\\extractedApks\\"
 monitor_dir = "C:\\Users\\Cyber\\Downloads"
 dest_dir = "C:\\Users\\Cyber\\Desktop\\extractedApks"
 directory_of_tools = "C:\\Users\\Cyber\\AppData\\Local\\Android\\Sdk\\build-tools\\33.0.1\\"
+db_queue_manager = None
 
+def start_socket(queue_manager):
+    global db_queue_manager
+    db_queue_manager = queue_manager
 
-def start_socket():
     return sio
+
 @sio.event
 def message(data):
     print('I received a message!')
@@ -55,8 +61,22 @@ def process_apk(data):
             if filename.endswith(".apk"):
                 apk_path = os.path.join(dest_dir, filename)
                 # print(filename)
-                print(extract_info(directory_of_tools, apk_path))
-                # insert into hash_checks table TODO
+                # print(extract_info(directory_of_tools, apk_path))
+                apk_info = extract_info(directory_of_tools, apk_path)
+                # print(f"Package Name: {type(apk_info['package_name'])}, Incoming Hash: {type(apk_info['app_hash'])}, App Cert Hash: {type(apk_info['app_cert_hash'])}, Permissions: {type(apk_info['permissions'])}, Result: {type(HashResult.UNCHECKED.value)}")
+
+                db_queue_manager.enqueue_db_task(insert_into_hash_checks_table,
+                                                apk_info['package_name'],
+                                                apk_info['app_hash'],
+                                                "",
+                                                apk_info['app_cert_hash'],
+                                                "",
+                                                apk_info['permissions'],
+                                                "",
+                                                HashResult.UNCHECKED.value)
+
+                                   
+
         
     
     

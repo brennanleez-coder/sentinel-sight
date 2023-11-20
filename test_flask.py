@@ -1,12 +1,8 @@
 from flask import Flask, jsonify, request, abort
-from hash_util import compute_sha256
-import subprocess
-import os
 from db import get_db_connection
 from hash_results import HashResult
 from flask_socketio import SocketIO
 from flask_cors import CORS 
-from threading import Thread
 
 conn = get_db_connection()
 cursor = conn.cursor()

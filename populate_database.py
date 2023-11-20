@@ -1,4 +1,4 @@
-from hash_util import compute_sha256
+from hash_util import compute_sha256_from_apk
 from datetime import datetime
 from extract_info_from_apk import extract_info
 import os
@@ -46,7 +46,7 @@ def insert_data_from_local_apk_directory(conn, directory_of_local_apks):
                 version_code, version_name, package_name, app_cert_hash, permissions = \
                 info['version_code'], info['version_name'], info['package_name'], info['app_cert_hash'], info['permissions']
 
-                apk_hash = compute_sha256(apk_path)
+                apk_hash = compute_sha256_from_apk(apk_path)
 
                 data = (package_name, apk_hash, version_code, version_name, app_cert_hash, permissions, datetime.now(), datetime.now())
 
@@ -56,9 +56,9 @@ def insert_data_from_local_apk_directory(conn, directory_of_local_apks):
                 # """, data)
                 
                 insert_into_legit_apk_info_table(conn, package_name, apk_hash, version_code, version_name, app_cert_hash, permissions)
-                print("Live apk data inserted successfully into legit_apk_info_table.")
 
-                
+        print("Live apk data inserted successfully into legit_apk_info_table.")
+
     except sqlite3.Error as e:
             print(f"An error occurred while inserting live apk data: {e}")
 
@@ -110,7 +110,7 @@ def main():
     
     # Insert live apk data from local directory
     insert_data_from_local_apk_directory(conn, directory_of_local_apks)
-    insert_mock_data_hash_checks(conn)
+    # insert_mock_data_hash_checks(conn)
     
     # Retrieve and print all rows
     # rows = retrieve_data(conn)
