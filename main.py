@@ -1,14 +1,20 @@
 from gui import create_gui
 from socket_client import start_socket
 from db_queue_manager import DBQueueManager
+from test_flask import run_flask
+from threading import Thread
+from directory import monitor_dir, dest_dir
 
 if __name__ == "__main__":
-    monitor_dir = "C:\\Users\\Cyber\\Downloads"
-    dest_dir = "C:\\Users\\Cyber\\Desktop\\extractedApks"
+    # monitor_dir = "C:\\Users\\Cyber\\Downloads"
+    # dest_dir = "C:\\Users\\Cyber\\Desktop\\extractedApks"
+    
+    flask_thread = Thread(target=run_flask)
+    flask_thread.start()
     
     # macbook setup
-    # monitor_dir = "/Users/brennanlee/Downloads/"
-    # dest_dir = "/Users/brennanlee/Desktop/extractedApks/"
+    monitor_dir = "/Users/brennanlee/Downloads/"
+    dest_dir = "/Users/brennanlee/Desktop/extractedApks/"
     monitoring_flag = {"active": False}  # Use a dict to allow for mutable flag
 
     db_queue_manager = DBQueueManager()

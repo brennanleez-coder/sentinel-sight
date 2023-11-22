@@ -5,7 +5,7 @@ from file_operations import perform_check
 from extract_info_from_apk import extract_info
 from db import insert_incoming_data_into_hash_checks_table,insert_into_hash_checks_table
 from hash_results import HashResult
-
+from directory import directory_of_tools, apk_file_path, monitor_dir, dest_dir
 sio = socketio.Client()
 db_queue_manager = None
 
@@ -16,11 +16,7 @@ db_queue_manager = None
 gui_output_text_callback = None
 global_monitoring_flag = None
 
-
-directory_of_local_apks = "C:\\Users\\Cyber\\Desktop\\extractedApks\\"
-monitor_dir = "C:\\Users\\Cyber\\Downloads"
-dest_dir = "C:\\Users\\Cyber\\Desktop\\extractedApks"
-directory_of_tools = "C:\\Users\\Cyber\\AppData\\Local\\Android\\Sdk\\build-tools\\33.0.1\\"
+directory_of_local_apks = dest_dir
 db_queue_manager = None
 
 def start_socket(queue_manager):
@@ -60,8 +56,6 @@ def process_apk(data):
         for filename in os.listdir(dest_dir):
             if filename.endswith(".apk"):
                 apk_path = os.path.join(dest_dir, filename)
-                # print(filename)
-                # print(extract_info(directory_of_tools, apk_path))
                 apk_info = extract_info(directory_of_tools, apk_path)
                 # print(f"Package Name: {type(apk_info['package_name'])}, Incoming Hash: {type(apk_info['app_hash'])}, App Cert Hash: {type(apk_info['app_cert_hash'])}, Permissions: {type(apk_info['permissions'])}, Result: {type(HashResult.UNCHECKED.value)}")
 

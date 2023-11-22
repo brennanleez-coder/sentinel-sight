@@ -1,6 +1,9 @@
 import re
 import subprocess
 from hash_util import compute_sha256_from_apk
+import os
+from directory import directory_of_tools, apk_file_path
+
 
 def extract_version_code(aapt_output):
     match = re.search(r"versionCode='(\d+)'", aapt_output)
@@ -54,10 +57,10 @@ def extract_info(directory_of_tools, apk_file_path):
     app_hash = extract_apk_hash(apk_file_path)
     
     # run apksigner to get the app cert hash
-    # apksigner_command = ["apksigner", "verify", "--print-certs", apk_file_path]
-    # apksigner_result = subprocess.run(apksigner_command, cwd=directory_of_tools, stdout=subprocess.PIPE)
-    # apksigner_output = apksigner_result.stdout.decode()
-    app_cert_hash = extract_app_cert_hash(aapt_output)
+    apksigner_command = ["apksigner", "verify", "--print-certs", apk_file_path]
+    apksigner_result = subprocess.run(apksigner_command, cwd=directory_of_tools, stdout=subprocess.PIPE)
+    apksigner_output = apksigner_result.stdout.decode()
+    app_cert_hash = extract_app_cert_hash(apksigner_output)
 
     # Return the info as JSON
     output = {
@@ -71,22 +74,16 @@ def extract_info(directory_of_tools, apk_file_path):
     return output
     
 # Mac
-# test extract_info
-# directory_of_tools = '/Users/brennanlee/library/Android/sdk/build-tools/33.0.1/'
-# apk_file_path = '/Users/brennanlee/Desktop/extractedApks/Facebook_441.0.0.0.93_apkcombo.com.apk'
+
 # If does not run, add aapt and apksigner to PATH
 # Location of tools: /Users/brennanlee/library/Android/sdk/build-tools/33.0.1
 # export PATH=$PATH:/Users/brennanlee/library/Android/sdk/build-tools/33.0.1
 
 
-# Windows
-directory_of_tools = "C:\\Users\\Cyber\\AppData\\Local\\Android\\Sdk\\build-tools\\33.0.1\\"
-apk_file_path = "C:\\Users\\Cyber\\Desktop\\extractedApks\\base.apk"
-
-
 
 # print(extract_info(directory_of_tools, apk_file_path))
 # directory_of_local_apks = "C:\\Users\\Cyber\\Desktop\\extractedApks\\"
+# directory_of_local_apks = "/Users/brennanlee/Desktop/extractedApks"
 # for filename in os.listdir(directory_of_local_apks):
 #         if filename.endswith(".apk"):
 
@@ -94,5 +91,5 @@ apk_file_path = "C:\\Users\\Cyber\\Desktop\\extractedApks\\base.apk"
 #             print(extract_info(directory_of_tools, apk_path))
 #             print('\n')
 
-#             # command = ["aapt", "dump", "badging", apk_path]
-#             # result = subprocess.run(command, cwd=directory_of_tools, stdout=subprocess.PIPE)
+            # command = ["aapt", "dump", "badging", apk_path]
+            # result = subprocess.run(command, cwd=directory_of_tools, stdout=subprocess.PIPE)
