@@ -8,7 +8,7 @@ from file_operations import perform_check
 from db import get_db_connection, get_all_legit_apk_info
 import sqlite3
 from socket_client import connect_to_server
-
+import requests
 db_queue_manager = None
 
 def start_monitoring_thread(sio, monitor_dir, dest_dir, output_text_callback, monitoring_flag):
@@ -111,14 +111,33 @@ def create_gui(sio, db_queue, monitor_dir, dest_dir, monitoring_flag):
     stop_button = tk.Button(button_frame, text="Stop Monitoring", command=stop_monitoring)
     stop_button.pack(side=tk.LEFT, padx=10)
 
+    # def exit_app():
+    #     try:
+    #         if monitoring_flag["active"]:
+    #             if messagebox.askyesno("Exit", "Monitoring is active. Are you sure you want to exit?"):
+    #                 monitoring_flag["active"] = False
+
+    #         if db_queue_manager is not None:
+    #             db_queue_manager.stop_db_worker()             
+    #     finally:
+    #         db_queue_manager.stop_db_worker()  # Stop the DB worker
+    #         if sio.connected:
+    #             sio.disconnect()
+    #         root.destroy()
+    
     def exit_app():
         try:
             if monitoring_flag["active"]:
                 if messagebox.askyesno("Exit", "Monitoring is active. Are you sure you want to exit?"):
                     monitoring_flag["active"] = False
 
+            requests.post('http://0.0.0.0:8000/shutdown')  # Adjust the URL/port as necessary
+
+
             if db_queue_manager is not None:
-                db_queue_manager.stop_db_worker()             
+                db_queue_manager.stop_db_worker()     
+        except requests.exceptions.RequestException as e:
+            print("Error shutting down Flask server:", e)        
         finally:
             db_queue_manager.stop_db_worker()  # Stop the DB worker
             if sio.connected:

@@ -17,6 +17,12 @@ def hello():
     socketio.emit('process_apk', {'message': 'Hello World from socket emit!'})
     return jsonify({"status": "success", "message": "Hello World!"})
 
+@app.route("/", methods=['POST'])
+def hello_post():
+    data = request.json
+    if not data:
+        abort(400, description="No JSON data provided")
+    return jsonify({"status": "success", "message": f"data received: {data}"}), 200
 
 @app.route('/submit_apk', methods=['POST'])
 def submit_apk():
@@ -45,6 +51,17 @@ def submit_apk():
 
     return jsonify({"status": "success", "message": "information received successfully."}),200
 
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    print(request.environ)
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    shutdown_server()
+    return jsonify({"status": "success", "message": "Server shutting down..."}), 200
 
 def run_flask():
     socketio.run(app, host='0.0.0.0', port=8000)
