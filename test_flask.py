@@ -30,6 +30,7 @@ def submit_apk():
     if not data:
         abort(400, description="No JSON data provided")
     
+    print(data)
     package_name = data['package_name']
     incoming_apk_hash = data['incoming_apk_hash']
     incoming_app_cert_hash = data['incoming_app_cert_hash']

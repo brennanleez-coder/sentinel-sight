@@ -6,8 +6,8 @@ from threading import Thread
 from directory import monitor_dir, dest_dir
 
 if __name__ == "__main__":
-    flask_thread = Thread(target=run_flask)
-    flask_thread.start()
+    # flask_thread = Thread(target=run_flask)
+    # flask_thread.start()
     
     monitoring_flag = {"active": False}  # Use a dict to allow for mutable flag
 
