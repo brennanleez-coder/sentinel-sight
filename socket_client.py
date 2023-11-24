@@ -3,7 +3,7 @@ import socketio
 import os
 from file_operations import perform_check
 from extract_info_from_apk import extract_info
-from db import insert_incoming_data_into_hash_checks_table,insert_into_hash_checks_table
+from db import insert_into_hash_checks_table
 from hash_results import HashResult
 from directory import directory_of_tools, apk_file_path, monitor_dir, dest_dir
 sio = socketio.Client()
@@ -25,10 +25,6 @@ def start_socket(queue_manager):
 
     return sio
 
-@sio.event
-def message(data):
-    print('I received a message!')
-
 def connect_to_server(server, sio, output_text_callback, monitoring_flag):
     global gui_output_text_callback
     global global_monitoring_flag
@@ -44,13 +40,16 @@ def connect_to_server(server, sio, output_text_callback, monitoring_flag):
 @sio.on('process_apk')
 def process_apk(data):
     if gui_output_text_callback is not None:
-        gui_output_text_callback(data['message'] + '\n')
-        apk_info = data['incoming_apk_info']
-        apk_info_str = "\n".join([f"{key}: {value}" for key, value in apk_info.items()])
-        gui_output_text_callback(apk_info_str + '\n')
+        gui_output_text_callback("Processing apk...\n\n")
         
-        # manual checking to ensure that there are no apks in downloads
-        # apks moved to dest_dir
+        apk_info = data['incoming_apk_info']
+        
+        # Print Apk Information received from server
+        apk_info_str = "\n".join([f"{key}: {value}" for key, value in apk_info.items()])
+        gui_output_text_callback(apk_info_str + '\n\n')
+        
+        # Manual checking to ensure that there are no apks in downloads
+        # Apks moved to dest_dir
         perform_check(monitor_dir, dest_dir, gui_output_text_callback)
 
         for filename in os.listdir(dest_dir):
@@ -61,6 +60,8 @@ def process_apk(data):
 
                 db_queue_manager.enqueue_db_task(insert_into_hash_checks_table,
                                                 apk_info['package_name'],
+                                                apk_info['version_code'],
+                                                apk_info['version_name'],
                                                 apk_info['app_hash'],
                                                 "",
                                                 apk_info['app_cert_hash'],

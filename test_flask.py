@@ -41,7 +41,6 @@ def submit_apk():
         return jsonify({"error": "Missing required fields"}), 400  # Bad Request
     
     socketio.emit('process_apk', {
-        'message': 'Hello World from socket emit!',
         'incoming_apk_info': {
         'package_name': package_name,
         'apk_hash': incoming_apk_hash,
