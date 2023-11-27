@@ -128,6 +128,17 @@ def insert_into_hash_checks_table(conn, package_name, version_name, version_code
     except sqlite3.Error as e:
         print(f"An error occurred while inserting data: {e}")
 
+def check_if_record_exists(conn, package_name, version_code):
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT package_name FROM hash_checks_table WHERE package_name = ? AND version_code = ?", (package_name, version_code))
+        result = cursor.fetchone()
+        if result is not None:
+            return True
+        else:
+            return False
+    except sqlite3.Error as e:
+        print(f"An error occurred while checking if record exists: {e}")
 
 def test_db_connection(conn):
     try:

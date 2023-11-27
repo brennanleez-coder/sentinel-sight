@@ -3,7 +3,7 @@ import socketio
 import os
 from file_operations import perform_check
 from extract_info_from_apk import extract_info
-from db import insert_into_hash_checks_table
+from db import insert_into_hash_checks_table, check_if_record_exists
 from hash_results import HashResult
 from directory import directory_of_tools, apk_file_path, monitor_dir, dest_dir
 sio = socketio.Client()
@@ -58,17 +58,21 @@ def process_apk(data):
                 apk_info = extract_info(directory_of_tools, apk_path)
                 # print(f"Package Name: {type(apk_info['package_name'])}, Incoming Hash: {type(apk_info['app_hash'])}, App Cert Hash: {type(apk_info['app_cert_hash'])}, Permissions: {type(apk_info['permissions'])}, Result: {type(HashResult.UNCHECKED.value)}")
 
-                db_queue_manager.enqueue_db_task(insert_into_hash_checks_table,
-                                                apk_info['package_name'],
-                                                apk_info['version_code'],
-                                                apk_info['version_name'],
-                                                apk_info['app_hash'],
-                                                "",
-                                                apk_info['app_cert_hash'],
-                                                "",
-                                                apk_info['permissions'],
-                                                "",
-                                                HashResult.UNCHECKED.value)
+                # check if package name version code version name exists
+                # if not, insert into db
+                # else, do nothing
+                if (db_queue_manager.enqueue_db_task(check_if_record_exists, apk_info['package_name'], apk_info['version_code'])):
+                    db_queue_manager.enqueue_db_task(insert_into_hash_checks_table,
+                                                    apk_info['package_name'],
+                                                    apk_info['version_code'],
+                                                    apk_info['version_name'],
+                                                    apk_info['app_hash'],
+                                                    "",
+                                                    apk_info['app_cert_hash'],
+                                                    "",
+                                                    apk_info['permissions'],
+                                                    "",
+                                                    HashResult.PENDING.value)
 
                                    
 
