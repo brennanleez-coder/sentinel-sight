@@ -32,18 +32,20 @@ def submit_apk():
     
     print(data)
     package_name = data['package_name']
+    version_code = data['version_code']
+    version_name = data['version_name']
     incoming_apk_hash = data['incoming_apk_hash']
     incoming_app_cert_hash = data['incoming_app_cert_hash']
     incoming_permissions = data['incoming_permissions']
-    result = HashResult.UNCHECKED
 
     if None in [package_name, incoming_apk_hash, incoming_app_cert_hash, incoming_permissions]:
         return jsonify({"error": "Missing required fields"}), 400  # Bad Request
     
     socketio.emit('process_apk', {
-        'message': 'Hello World from socket emit!',
         'incoming_apk_info': {
         'package_name': package_name,
+        'version_name': version_name,
+        'version_code': version_code,
         'apk_hash': incoming_apk_hash,
         'app_cert_hash': incoming_app_cert_hash,
         'permissions': incoming_permissions

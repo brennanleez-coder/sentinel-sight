@@ -4,14 +4,7 @@ from extract_info_from_apk import extract_info
 import os
 from db import get_db_connection, insert_into_legit_apk_info_table
 import sqlite3
-
-# macbook setup
-# directory_of_local_apks = '/Users/brennanlee/Desktop/extractedApks/'
-# directory_of_tools = '/Users/brennanlee/library/Android/sdk/build-tools/33.0.1/'
-
-# windows setup
-directory_of_tools = "C:\\Users\\Cyber\\AppData\\Local\\Android\\Sdk\\build-tools\\33.0.1"
-directory_of_local_apks = "C:\\Users\\Cyber\\Desktop\\extractedApks"
+from directory import directory_of_tools, directory_of_local_apks
 
 def insert_mock_data_apk_info(conn):
     cursor = conn.cursor()
@@ -35,7 +28,6 @@ def insert_mock_data_apk_info(conn):
     conn.commit()
 
 def insert_data_from_local_apk_directory(conn, directory_of_local_apks):
-    cursor = conn.cursor()
     try:
         for filename in os.listdir(directory_of_local_apks):
             if filename.endswith(".apk"):
@@ -48,14 +40,17 @@ def insert_data_from_local_apk_directory(conn, directory_of_local_apks):
 
                 apk_hash = compute_sha256_from_apk(apk_path)
 
-                data = (package_name, apk_hash, version_code, version_name, app_cert_hash, permissions, datetime.now(), datetime.now())
 
                 # cursor.execute("""
                 #     INSERT INTO legit_apk_info_table (package_name, apk_hash, version_code, version_name, app_cert_hash, permissions, createdAt, updatedAt)
                 #     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 # """, data)
-                
-                insert_into_legit_apk_info_table(conn, package_name, apk_hash, version_code, version_name, app_cert_hash, permissions)
+                cursor = conn.cursor()
+                is_package_present = cursor.execute("SELECT package_name FROM legit_apk_info_table WHERE package_name = ?", (package_name,))
+                if is_package_present.fetchone() is None:
+                    insert_into_legit_apk_info_table(conn, package_name, apk_hash, version_code, version_name, app_cert_hash, permissions)
+                else:
+                    print(f"Package {package_name} already exists in legit_apk_info_table.")
 
         print("Live apk data inserted successfully into legit_apk_info_table.")
 
