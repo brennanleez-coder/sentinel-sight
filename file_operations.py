@@ -26,24 +26,19 @@ def perform_check(monitor_dir, dest_dir, output_text):
 
     conn = get_db_connection()
     cursor = conn.cursor()
-
-    list_of_legit_apk_info = get_all_legit_apk_info(conn)
-    if (len(list_of_legit_apk_info) == len(os.listdir(dest_dir))):
-        output_text(f"{get_timestamp()} - legit_apk_info table is up to date.\n")
-        return
-    else:
-        for filename in os.listdir(dest_dir):
-            if filename.endswith(".apk"):
-                apk_path = os.path.join(dest_dir, filename)
-                info = extract_info(directory_of_tools, apk_path)
-                app_hash, version_code, version_name, package_name, app_cert_hash, permissions = \
-                info['app_hash'], info['version_code'], info['version_name'], info['package_name'], info['app_cert_hash'], info['permissions']
-                is_package_present = cursor.execute("SELECT package_name FROM legit_apk_info_table WHERE package_name = ? AND version_code = ?", (package_name, version_code))
-                if is_package_present.fetchone() is None:
-                    insert_into_legit_apk_info_table(conn, package_name, app_hash, version_code, version_name, app_cert_hash, permissions)
-                    output_text(f"{get_timestamp()} - Inserted {package_name} into legit_apk_info_table.\n")
-                else:
-                    print(f"Package {package_name} already exists in legit_apk_info_table.")
+    
+    for filename in os.listdir(dest_dir):
+        if filename.endswith(".apk"):
+            apk_path = os.path.join(dest_dir, filename)
+            info = extract_info(directory_of_tools, apk_path)
+            app_hash, version_code, version_name, package_name, app_cert_hash, permissions = \
+            info['app_hash'], info['version_code'], info['version_name'], info['package_name'], info['app_cert_hash'], info['permissions']
+            is_package_present = cursor.execute("SELECT package_name FROM legit_apk_info_table WHERE package_name = ? AND version_code = ?", (package_name, version_code))
+            if is_package_present.fetchone() is None:
+                insert_into_legit_apk_info_table(conn, package_name, app_hash, version_code, version_name, app_cert_hash, permissions)
+                output_text(f"{get_timestamp()} - Inserted {package_name} into legit_apk_info_table.\n")
+            else:
+                print(f"Package {package_name} already exists in legit_apk_info_table.")
     output_text(f"{get_timestamp()} - legit_apk_info table is up to date.\n")
     output_text(f"{get_timestamp()} ===================================== \n")
 

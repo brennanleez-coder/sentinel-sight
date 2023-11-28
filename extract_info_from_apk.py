@@ -57,10 +57,10 @@ def extract_info(directory_of_tools, apk_file_path):
     app_hash = extract_apk_hash(apk_file_path)
     
     # run apksigner to get the app cert hash
-    # apksigner_command = ["apksigner", "verify", "--print-certs", apk_file_path]
-    # apksigner_result = subprocess.run(apksigner_command, cwd=directory_of_tools, stdout=subprocess.PIPE)
-    # apksigner_output = apksigner_result.stdout.decode()
-    app_cert_hash = extract_app_cert_hash(aapt_output)
+    apksigner_command = ["apksigner", "verify", "--print-certs", apk_file_path]
+    apksigner_result = subprocess.run(apksigner_command, cwd=directory_of_tools, stdout=subprocess.PIPE)
+    apksigner_output = apksigner_result.stdout.decode()
+    app_cert_hash = extract_app_cert_hash(apksigner_output)
 
     output = {
         'version_code': version_code,
