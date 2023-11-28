@@ -57,12 +57,11 @@ def extract_info(directory_of_tools, apk_file_path):
     app_hash = extract_apk_hash(apk_file_path)
     
     # run apksigner to get the app cert hash
-    apksigner_command = ["apksigner", "verify", "--print-certs", apk_file_path]
-    apksigner_result = subprocess.run(apksigner_command, cwd=directory_of_tools, stdout=subprocess.PIPE)
-    apksigner_output = apksigner_result.stdout.decode()
-    app_cert_hash = extract_app_cert_hash(apksigner_output)
+    # apksigner_command = ["apksigner", "verify", "--print-certs", apk_file_path]
+    # apksigner_result = subprocess.run(apksigner_command, cwd=directory_of_tools, stdout=subprocess.PIPE)
+    # apksigner_output = apksigner_result.stdout.decode()
+    app_cert_hash = extract_app_cert_hash(aapt_output)
 
-    # Return the info as JSON
     output = {
         'version_code': version_code,
         'version_name': version_name,
@@ -77,13 +76,14 @@ def extract_info(directory_of_tools, apk_file_path):
 
 # If does not run, add aapt and apksigner to PATH
 # Location of tools: /Users/brennanlee/library/Android/sdk/build-tools/33.0.1
+# directory_of_local_apks = "/Users/brennanlee/Desktop/extractedApks"
+
 # export PATH=$PATH:/Users/brennanlee/library/Android/sdk/build-tools/33.0.1
 
 
 
 # print(extract_info(directory_of_tools, apk_file_path))
 # directory_of_local_apks = "C:\\Users\\Cyber\\Desktop\\extractedApks\\"
-# directory_of_local_apks = "/Users/brennanlee/Desktop/extractedApks"
 # for filename in os.listdir(directory_of_local_apks):
 #         if filename.endswith(".apk"):
 

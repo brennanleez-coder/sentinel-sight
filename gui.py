@@ -5,7 +5,7 @@ from tkinter import messagebox
 import threading
 import time
 from file_operations import perform_check
-from db import get_db_connection, get_all_legit_apk_info
+from db import get_db_connection, get_all_legit_apk_info, get_all_hash_checks
 import sqlite3
 from socket_client import connect_to_server
 import requests
@@ -31,7 +31,7 @@ def monitor_directory(monitor_dir, dest_dir, output_text_callback, monitoring_fl
     output_text_callback("Listener triggered...\n")
     while monitoring_flag["active"]:
         perform_check(monitor_dir, dest_dir, output_text_callback)
-        time.sleep(50)  # Check every 50 seconds
+        time.sleep(300)  # Check every 50 seconds
 
 def open_database_view(db_file='verified_apk_data.db'):
     db_window = tk.Toplevel()
@@ -147,8 +147,54 @@ def create_gui(sio, db_queue, monitor_dir, dest_dir, monitoring_flag):
     exit_button = tk.Button(button_frame, text="Exit", command=exit_app)
     exit_button.pack(side=tk.RIGHT, padx=10)
 
-    view_db_button = tk.Button(button_frame, text="View Database", command=open_database_view)
+    view_db_button = tk.Button(button_frame, text="View Legit Apk Info", command=open_database_view)
     view_db_button.pack(side=tk.LEFT, padx=10)
+
+    def view_hash_checks():
+        hash_checks_window = tk.Toplevel()
+        hash_checks_window.title("Hash Checks Table")
+        hash_checks_window.geometry("800x800")
+
+        # Create a frame for the Treeview and the scrollbars
+        tree_frame = tk.Frame(hash_checks_window)
+        tree_frame.pack(fill='both', expand=True)
+
+        columns = ("ID", "Package Name", "APK Hash", "Version Code", "Version Number", "Cert Hash", "Permissions", "Created At", "Updated At")
+        tree = ttk.Treeview(tree_frame, columns=columns, show='headings')
+
+        v_scroll = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
+        v_scroll.pack(side='right', fill='y')
+
+        h_scroll = ttk.Scrollbar(tree_frame, orient="horizontal", command=tree.xview)
+        h_scroll.pack(side='bottom', fill='x')
+
+        tree.configure(yscrollcommand=v_scroll.set, xscrollcommand=h_scroll.set)
+        tree.pack(fill='both', expand=True)
+
+        for col in columns:
+            tree.heading(col, text=col)
+            tree.column(col, anchor='w')
+
+        def populate_treeview():
+            for i in tree.get_children():
+                tree.delete(i)
+                
+            try:
+                conn = get_db_connection()
+                rows = get_all_hash_checks(conn)
+                for row in rows:
+                    tree.insert('', 'end', values=row)
+                conn.close()
+            except sqlite3.Error as e:
+                messagebox.showerror("Database Error", f"An error occurred: {e}")
+                print(f"An error occurred: {e}")
+        populate_treeview()
+        refresh_button = tk.Button(hash_checks_window, text="Refresh", command=populate_treeview)
+        refresh_button.pack(side='bottom', pady=10)
+
+    view_hash_checks_button = tk.Button(root, text="View Hash Checks", command=view_hash_checks)
+    # place the butotn beside the view database button
+    view_hash_checks_button.pack(side=tk.LEFT, padx=10)
 
     root.mainloop()
 
