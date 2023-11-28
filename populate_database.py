@@ -35,10 +35,9 @@ def insert_data_from_local_apk_directory(conn, directory_of_local_apks):
                 info = extract_info(directory_of_tools, apk_path)
 
                 # Extracting values
-                version_code, version_name, package_name, app_cert_hash, permissions = \
-                info['version_code'], info['version_name'], info['package_name'], info['app_cert_hash'], info['permissions']
+                app_hash, version_code, version_name, package_name, app_cert_hash, permissions = \
+                info['app_hash'], info['version_code'], info['version_name'], info['package_name'], info['app_cert_hash'], info['permissions']
 
-                apk_hash = compute_sha256_from_apk(apk_path)
 
 
                 # cursor.execute("""
@@ -46,9 +45,9 @@ def insert_data_from_local_apk_directory(conn, directory_of_local_apks):
                 #     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 # """, data)
                 cursor = conn.cursor()
-                is_package_present = cursor.execute("SELECT package_name FROM legit_apk_info_table WHERE package_name = ?", (package_name,))
+                is_package_present = cursor.execute("SELECT package_name FROM legit_apk_info_table WHERE package_name = ? AND version_code = ?", (package_name, version_code))
                 if is_package_present.fetchone() is None:
-                    insert_into_legit_apk_info_table(conn, package_name, apk_hash, version_code, version_name, app_cert_hash, permissions)
+                    insert_into_legit_apk_info_table(conn, package_name, app_hash, version_code, version_name, app_cert_hash, permissions)
                 else:
                     print(f"Package {package_name} already exists in legit_apk_info_table.")
 

@@ -51,7 +51,6 @@ def insert_into_legit_apk_info_table(conn, package_name, apk_hash="", version_co
                 permissions
             )
         )
-        print("Data inserted successfully into legit_apk_info_table.")
     except sqlite3.Error as e:
         print(f"An error occurred while inserting data: {e}")
 
@@ -133,12 +132,25 @@ def check_if_record_exists(conn, package_name, version_code):
         cursor = conn.cursor()
         cursor.execute("SELECT package_name FROM hash_checks_table WHERE package_name = ? AND version_code = ?", (package_name, version_code))
         result = cursor.fetchone()
-        if result is not None:
-            return True
-        else:
+        if result is None:
             return False
+        else:
+            return True
     except sqlite3.Error as e:
         print(f"An error occurred while checking if record exists: {e}")
+
+def determine_apk_legitimacy_from_hash_checks_table(conn, package_name, version_code):
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT result FROM hash_checks_table WHERE package_name = ? AND version_code = ?", (package_name, version_code))
+        result = cursor.fetchone()
+        if result is not None:
+            return result
+        else:
+            return None
+    except sqlite3.Error as e:
+        print(f"An error occurred while determining apk legitimacy: {e}")
+
 
 def test_db_connection(conn):
     try:
@@ -157,6 +169,15 @@ def get_all_legit_apk_info(conn):
     try:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM legit_apk_info_table")
+        rows = cursor.fetchall()
+        return rows
+    except sqlite3.Error as e:
+        print(f"An error occurred: {e}")
+
+def get_all_hash_checks(conn):
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM hash_checks_table")
         rows = cursor.fetchall()
         return rows
     except sqlite3.Error as e:
