@@ -4,12 +4,12 @@ from tkinter import scrolledtext
 from tkinter import messagebox
 import threading
 import time
-from file_operations import perform_check
+from file_operations import perform_check, save_scrolledtext_to_file, get_timestamp
 from db import get_db_connection, get_all_legit_apk_info, get_all_hash_checks
 import sqlite3
 from socket_client import connect_to_server
 db_queue_manager = None
-
+log_text = None
 def start_monitoring_thread(sio, monitor_dir, dest_dir, output_text_callback, monitoring_flag):
     if not monitoring_flag["active"]:
         monitoring_flag["active"] = True
@@ -79,6 +79,7 @@ def open_database_view(db_file='verified_apk_data.db'):
     populate_treeview()
 
 def create_gui(sio, db_queue, monitor_dir, dest_dir, monitoring_flag):
+    global log_text
     root = tk.Tk()
     root.title("Directory Monitoring")
     root.geometry("800x800")
@@ -87,6 +88,7 @@ def create_gui(sio, db_queue, monitor_dir, dest_dir, monitoring_flag):
 
     output_text = scrolledtext.ScrolledText(root, height=40, width=60)
     output_text.pack(padx=10, pady=10)
+    log_text = output_text
         
     def output_text_callback(message):
         output_text.insert(tk.END, message)
@@ -112,6 +114,7 @@ def create_gui(sio, db_queue, monitor_dir, dest_dir, monitoring_flag):
 
     def exit_app():
         try:
+            save_scrolledtext_to_file(log_text, f"{get_timestamp()} - logs.txt", tk)
             if monitoring_flag["active"]:
                 if messagebox.askyesno("Exit", "Monitoring is active. Are you sure you want to exit?"):
                     monitoring_flag["active"] = False
@@ -173,7 +176,7 @@ def create_gui(sio, db_queue, monitor_dir, dest_dir, monitoring_flag):
         refresh_button.pack(side='bottom', pady=10)
 
     view_hash_checks_button = tk.Button(root, text="View Hash Checks", command=view_hash_checks)
-    # place the butotn beside the view database button
+    # place the button beside the view database button
     view_hash_checks_button.pack(side=tk.LEFT, padx=10)
 
     root.mainloop()

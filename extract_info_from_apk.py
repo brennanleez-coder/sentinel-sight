@@ -18,7 +18,7 @@ def extract_package_name(aapt_output):
     return match.group(1) if match else None
 def extract_permissions(aapt_output):
     permissions = re.findall(r'uses-permission: name=\'([^\']+)\'', aapt_output)
-    return ', '.join(permissions) if permissions else None
+    return ','.join(permissions) if permissions else None
 
 def extract_apk_hash(apk_file_path):
     '''

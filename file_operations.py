@@ -43,3 +43,19 @@ def perform_check(monitor_dir, dest_dir, output_text):
     output_text(f"{get_timestamp()} ===================================== \n")
 
 
+def save_scrolledtext_to_file(output_text_widget, filename, tk):
+    # Retrieve the entire text from the ScrolledText widget
+    full_text = output_text_widget.get("1.0", tk.END)
+
+
+    desktop_path = os.path.join(os.path.expanduser("~"), 'Desktop')
+    file_path = os.path.join(desktop_path, filename)
+
+    print(desktop_path)
+    with open(file_path, 'w', encoding='utf-8') as file:
+        file.write(full_text)
+        
+
+    
+
+    print(f"File saved to {file_path}")

@@ -95,6 +95,9 @@ def process_apk(data):
                 incoming_permissions=apk_info['permissions'],
                 downloaded_permissions=downloaded_permissions
             )
+            print(apk_info['permissions'])
+            print(downloaded_permissions)
+            
             # update hash_checks_table downloaded fields
             query = """
             UPDATE hash_checks_table

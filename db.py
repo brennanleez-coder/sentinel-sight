@@ -22,8 +22,7 @@ def create_legit_apk_info_table(conn):
                     app_cert_hash TEXT,
                     permissions TEXT,
                     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (package_name) REFERENCES hash_checks_table(package_name)
+                    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
         """
         )
