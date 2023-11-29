@@ -142,7 +142,7 @@ def create_gui(sio, db_queue, monitor_dir, dest_dir, monitoring_flag):
         tree_frame = tk.Frame(hash_checks_window)
         tree_frame.pack(fill='both', expand=True)
 
-        columns = ("ID", "Package Name", "APK Hash", "Version Code", "Version Number", "Cert Hash", "Permissions", "Created At", "Updated At")
+        columns = ("ID", "package_name", "version_code", "version_name", "incoming_hash", "downloaded_hash", "incoming_app_cert_hash", "downloaded_app_cert_hash", "incoming_permissions", "downloaded_permissions", "result", "received_time", "checked_time")
         tree = ttk.Treeview(tree_frame, columns=columns, show='headings')
 
         v_scroll = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
