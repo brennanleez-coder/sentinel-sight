@@ -74,9 +74,9 @@ def process_apk(data):
                                             apk_info['permissions'],
                                             "",
                                             HashResult.PENDING.value)
-            gui_output_text_callback(f"{get_timestamp()} - {apk_info['package_name']}: {apk_info['version_code']} awaiting downloaded APK.\n")
+            gui_output_text_callback(f"{get_timestamp()} - {apk_info['package_name']}: version code: {apk_info['version_code']} awaiting downloaded APK.\n")
         else:
-            gui_output_text_callback(f"{get_timestamp()} - {apk_info['package_name']}: {apk_info['version_code']} PENDING APK CHECKS.\n")        
+            gui_output_text_callback(f"{get_timestamp()} - {apk_info['package_name']}: version code: {apk_info['version_code']} PENDING APK CHECKS.\n")        
         gui_output_text_callback(f"{get_timestamp()} ===================================== \n")
 
         cursor.execute("SELECT package_name, apk_hash, app_cert_hash, permissions FROM legit_apk_info_table WHERE package_name = ? AND version_code = ?", ( apk_info['package_name'], apk_info['version_code']))

@@ -2,7 +2,9 @@ import re
 import subprocess
 from hash_util import compute_sha256_from_apk
 import os
-from directory import directory_of_tools, apk_file_path
+from directory import directory_of_tools, apksigner_path
+import platform
+current_os = platform.system()
 
 
 def extract_version_code(aapt_output):
@@ -56,11 +58,17 @@ def extract_info(directory_of_tools, apk_file_path):
     permissions = extract_permissions(aapt_output)
     app_hash = extract_apk_hash(apk_file_path)
     
-    # run apksigner to get the app cert hash
-    apksigner_command = ["apksigner", "verify", "--print-certs", apk_file_path]
-    apksigner_result = subprocess.run(apksigner_command, cwd=directory_of_tools, stdout=subprocess.PIPE)
-    apksigner_output = apksigner_result.stdout.decode()
-    app_cert_hash = extract_app_cert_hash(apksigner_output)
+
+    if current_os == "Darwin":
+        apksigner_command = ["apksigner", "verify", "--print-certs", apk_file_path]
+        apksigner_result = subprocess.run(apksigner_command, cwd=directory_of_tools, stdout=subprocess.PIPE)
+    else:
+        # Code for other operating systems (e.g., Windows)
+        apksigner_path = "C:\\Users\\Cyber\\AppData\\Local\\Android\\Sdk\\build-tools\\33.0.1\\apksigner.bat"
+        apksigner_command = [apksigner_path, "verify", "--print-certs", apk_file_path]
+        apksigner_result = subprocess.run(apksigner_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    app_cert_hash = extract_app_cert_hash(apksigner_result.stdout.decode())
 
     output = {
         'version_code': version_code,
@@ -91,5 +99,5 @@ def extract_info(directory_of_tools, apk_file_path):
 #             print(extract_info(directory_of_tools, apk_path))
 #             print('\n')
 
-            # command = ["aapt", "dump", "badging", apk_path]
-            # result = subprocess.run(command, cwd=directory_of_tools, stdout=subprocess.PIPE)
+#             command = ["aapt", "dump", "badging", apk_path]
+#             result = subprocess.run(command, cwd=directory_of_tools, stdout=subprocess.PIPE)
