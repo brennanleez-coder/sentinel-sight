@@ -79,16 +79,6 @@ def extract_info(directory_of_tools, apk_file_path):
         'permissions': permissions,
     }
     return output
-    
-# Mac
-
-# If does not run, add aapt and apksigner to PATH
-# Location of tools: /Users/brennanlee/library/Android/sdk/build-tools/33.0.1
-# directory_of_local_apks = "/Users/brennanlee/Desktop/extractedApks"
-
-# export PATH=$PATH:/Users/brennanlee/library/Android/sdk/build-tools/33.0.1
-
-
 
 # print(extract_info(directory_of_tools, apk_file_path))
 # directory_of_local_apks = "C:\\Users\\Cyber\\Desktop\\extractedApks\\"
