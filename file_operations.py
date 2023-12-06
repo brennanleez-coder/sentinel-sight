@@ -9,6 +9,11 @@ import platform
 def get_timestamp():
     return datetime.now().strftime("%Y_%m_%d %H_%M_%S")
 
+# Perform check on downloaded apks
+# @params: monitor_dir: directory to monitor for downloaded apks
+# @params: dest_dir: directory to move downloaded apks to
+# @params: output_text: function to output text to GUI
+
 def perform_check(monitor_dir, dest_dir, output_text):
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
@@ -44,6 +49,10 @@ def perform_check(monitor_dir, dest_dir, output_text):
     output_text(f"{get_timestamp()} ===================================== \n")
 
 
+# Extract logs from GUI
+# @params: output_text: function to output text to GUI
+# @params: filename, name of file to save to desktop
+# @params: tk, tkinter object
 def save_scrolledtext_to_file(output_text_widget, filename, tk):
     # Retrieve the entire text from the ScrolledText widget
     full_text = output_text_widget.get("1.0", tk.END)

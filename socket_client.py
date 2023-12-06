@@ -44,12 +44,12 @@ def process_apk(data):
         
         gui_output_text_callback(f"{get_timestamp()} ============APK Received============= \n")
         apk_info = data['incoming_apk_info']
-        gui_output_text_callback(f"{get_timestamp()} ===================================== \n")
         
         # Print Apk Information received from server
         apk_info_str = "\n".join([f"{key}: {value}" for key, value in apk_info.items()])
         gui_output_text_callback(apk_info_str + '\n\n')
         perform_check(monitor_dir, dest_dir, gui_output_text_callback)
+        gui_output_text_callback(f"{get_timestamp()} ===================================== \n")
 
 
         # check if package name version code version name exists

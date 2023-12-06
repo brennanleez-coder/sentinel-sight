@@ -1,6 +1,6 @@
 import hashlib
 
-
+# Compute the SHA256 hash of a file
 def compute_sha256_from_apk(apk_file_path):
     hash_sha256 = hashlib.sha256()
     with open(apk_file_path, "rb") as f:

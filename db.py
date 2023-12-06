@@ -1,6 +1,7 @@
 import sqlite3
 import datetime
 
+# Create a database connection to a SQLite database
 def get_db_connection(db_file='verified_apk_data.db'):
     conn = sqlite3.connect(db_file)
     conn.isolation_level = None  # Sets connection to auto-commit mode

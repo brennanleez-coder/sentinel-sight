@@ -5,10 +5,9 @@ from test_flask import run_flask
 from threading import Thread
 from directory import monitor_dir, dest_dir
 
+
+# Main entry point into the GUI application
 if __name__ == "__main__":
-    # flask_thread = Thread(target=run_flask)
-    # flask_thread.start()
-    
     monitoring_flag = {"active": False}  # Use a dict to allow for mutable flag
 
     db_queue_manager = DBQueueManager()

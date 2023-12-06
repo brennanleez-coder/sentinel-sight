@@ -42,11 +42,10 @@ def extract_app_cert_hash(apksigner_output):
     
     return match.group(1) if match else ""
 
-
-# params: directory of tools, apk file path
-# directory of tools is the location of aapt and apksigner
-# apk_file_path is the location of the apk file
-# return: json object of the extracted info
+# Extract info from apk file
+# @params: directory_of_tools: directory of Android build tools
+# @params: apk_file_path: directory of apk file
+# @return: json object of the extracted info
 def extract_info(directory_of_tools, apk_file_path):
     aapt_command = ["aapt", "dump", "badging", apk_file_path]
     # Run aapt to get the version info

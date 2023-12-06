@@ -4,6 +4,9 @@ from db import get_db_connection
 
 db_operation_queue = queue.Queue()
 
+# DBQueueManager ensures a single thread is used to access the database
+# This is necessary because SQLite does not support multithreaded access
+# See https://docs.python.org/3/library/sqlite3.html#multithreading
 class DBQueueManager:
     def __init__(self):
         self.db_operation_queue = queue.Queue()

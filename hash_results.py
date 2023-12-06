@@ -11,6 +11,14 @@ class HashResult(Enum):
     DIFF_AHPSACH="Rank 6 - DIFF: Permissions, App Hash | Same: App Cert Hash"
     DIFF_ACHPAH="Rank 7 - DIFF: App Cert Hash, App Hash, Permissions"
 
+# Determine level of apk legitimacy
+# @params: incoming_apk_hash: hash of apk file from incoming apk
+# @params: downloaded_apk_hash: hash of apk file from downloaded apk
+# @params: incoming_app_cert_hash: hash of app cert from incoming apk
+# @params: downloaded_app_cert_hash: hash of app cert from downloaded apk
+# @params: incoming_permissions: permissions from incoming apk
+# @params: downloaded_permissions: permissions from downloaded apk
+# @return: HashResult enum
 def determine_apk_legitimacy(incoming_apk_hash, downloaded_apk_hash, incoming_app_cert_hash, downloaded_app_cert_hash, incoming_permissions, downloaded_permissions):
     # Using hash_results enum, determine level of apk legitimacy
     # and update hash_checks_table result field
