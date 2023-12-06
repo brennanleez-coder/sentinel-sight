@@ -114,7 +114,6 @@ def create_gui(sio, db_queue, monitor_dir, dest_dir, monitoring_flag):
 
     def exit_app():
         try:
-            save_scrolledtext_to_file(log_text, f"{get_timestamp()} - logs.txt", tk)
             if monitoring_flag["active"]:
                 if messagebox.askyesno("Exit", "Monitoring is active. Are you sure you want to exit?"):
                     monitoring_flag["active"] = False
@@ -125,6 +124,8 @@ def create_gui(sio, db_queue, monitor_dir, dest_dir, monitoring_flag):
             db_queue_manager.stop_db_worker()  # Stop the DB worker
             if sio.connected:
                 sio.disconnect()
+            save_scrolledtext_to_file(log_text, f"{get_timestamp()} - logs", tk)
+
             root.destroy()
 
     exit_button = tk.Button(button_frame, text="Exit", command=exit_app)
