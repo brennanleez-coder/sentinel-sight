@@ -12,18 +12,6 @@ app.config['SECRET_KEY'] = '4FB3D994-8B97-4EA3-A492-FCAA51E88A4B'  # Replace wit
 CORS(app)
 socketio = SocketIO(app)
 
-@app.route("/")
-def hello():
-    socketio.emit('process_apk', {'message': 'Hello World from socket emit!'})
-    return jsonify({"status": "success", "message": "Hello World!"})
-
-@app.route("/", methods=['POST'])
-def hello_post():
-    data = request.json
-    if not data:
-        abort(400, description="No JSON data provided")
-    return jsonify({"status": "success", "message": f"data received: {data}"}), 200
-
 @app.route('/submit_apk', methods=['POST'])
 def submit_apk():
     data = request.json
