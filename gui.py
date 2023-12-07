@@ -7,9 +7,17 @@ import time
 from file_operations import perform_check, save_scrolledtext_to_file, get_timestamp
 from db import get_db_connection, get_all_legit_apk_info, get_all_hash_checks
 import sqlite3
-from socket_client import connect_to_server
+from socket_client import connect_to_server, process_apk
 db_queue_manager = None
 log_text = None
+apk_info = None
+
+def get_apk_info(apk_info_retrieved):
+    global apk_info
+    apk_info = apk_info_retrieved
+
+
+
 def start_monitoring_thread(sio, monitor_dir, dest_dir, output_text_callback, monitoring_flag):
     if not monitoring_flag["active"]:
         monitoring_flag["active"] = True
@@ -30,7 +38,7 @@ def monitor_directory(monitor_dir, dest_dir, output_text_callback, monitoring_fl
     output_text_callback("Listener triggered...\n")
     while monitoring_flag["active"]:
         perform_check(monitor_dir, dest_dir, output_text_callback)
-        time.sleep(300)  # Check every 50 seconds
+        time.sleep(60)  # Check every minute
 
 def open_database_view(db_file='verified_apk_data.db'):
     db_window = tk.Toplevel()
@@ -81,7 +89,7 @@ def open_database_view(db_file='verified_apk_data.db'):
 def create_gui(sio, db_queue, monitor_dir, dest_dir, monitoring_flag):
     global log_text
     root = tk.Tk()
-    root.title("Directory Monitoring")
+    root.title("Sentinel-Sight")
     root.geometry("800x800")
 
     db_queue_manager = db_queue
@@ -104,6 +112,9 @@ def create_gui(sio, db_queue, monitor_dir, dest_dir, monitoring_flag):
 
     check_button = tk.Button(button_frame, text="Check Now", command=lambda: perform_check(monitor_dir, dest_dir, output_text_callback))
     check_button.pack(side=tk.LEFT, padx=10)
+
+    evaluate_button = tk.Button(button_frame, text="Evaluate Now", command=lambda: process_apk(apk_info))
+    evaluate_button.pack(side=tk.LEFT, padx=10)
 
     def stop_monitoring():
         monitoring_flag["active"] = False

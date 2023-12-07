@@ -6,9 +6,9 @@ from extract_info_from_apk import extract_info
 from db import get_all_legit_apk_info, get_db_connection, insert_into_legit_apk_info_table
 import webbrowser
 from fpdf import FPDF
-
+from analyse_logs import analyze_log_text
 def get_timestamp():
-    return datetime.now().strftime("%Y_%m_%d %H_%M_%S")
+    return datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 
 # Perform check on downloaded apks
 # @params: monitor_dir: directory to monitor for downloaded apks
@@ -56,17 +56,16 @@ class PDF(FPDF):
     def header(self):
         self.set_font('Arial', 'B', 16)
         # Calculate width of title and position
-        title_w = self.get_string_width('Sentinel-sight Report') + 6
+        title_w = self.get_string_width('Sentinel-Sight Report') + 6
         self.set_x((210 - title_w) / 2)  # 210 mm is approximately the width of an A4 page
         # Title
-        self.cell(title_w, 10, 'Sentinel-sight Report', 0, 1, 'C')
+        self.cell(title_w, 10, 'Sentinel-Sight Report', 0, 1, 'C')
         # Subtitle with timestamp
         self.set_font('Arial', 'I', 12)
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         subtitle_w = self.get_string_width(f'Generated as of {timestamp}') + 6
         self.set_x((210 - subtitle_w) / 2)  # Center subtitle
         self.cell(subtitle_w, 10, f'Generated as of {timestamp}', 0, 0, 'C')
-        # Line break
         self.ln(20)
         # Logo
         self.image('./assets/Sentinel_Sight.png', 170, 10, 30)  # Position the logo at x = 170, y = 10 with a width of 30 mm
@@ -83,15 +82,16 @@ class PDF(FPDF):
 def save_scrolledtext_to_file(output_text_widget, filename, tk):
     # Retrieve the entire text from the ScrolledText widget
     full_text = output_text_widget.get("1.0", tk.END)
-    if full_text == '\n':
-        print("No logs to save.")
-        return
 
+    # Analyze the log text
+    phrases_count, reconciliation_count = analyze_log_text(full_text)
+
+    # Define the path to save the PDF
     desktop_path = os.path.join(os.path.expanduser("~"), 'Desktop')
-    # Create a directory called Sentinel Sight Reports
-    if not os.path.exists(os.path.join(desktop_path, 'Sentinel Sight Reports')):
-        os.makedirs(os.path.join(desktop_path, 'Sentinel Sight Reports'))
-    report_dir = os.path.join(desktop_path, 'Sentinel Sight Reports')
+    # Sentinel Sight Report directory
+    report_dir = os.path.join(desktop_path, 'Sentinel Sight Report')
+    if not os.path.exists(report_dir):
+        os.makedirs(report_dir)
     file_path = os.path.join(report_dir, filename)
 
     # Create a PDF document
@@ -100,7 +100,21 @@ def save_scrolledtext_to_file(output_text_widget, filename, tk):
     pdf.set_margins(15, 15, 15)
     pdf.add_page()
 
-    # Add subheader
+    # Add analysis of logs section
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 10, 'Summary of Logs:', 0, 1)
+    pdf.set_font("Arial", '', 12)
+    for phrase, count in phrases_count.items():
+        pdf.cell(0, 10, f'{phrase}: {count}', 0, 1)
+        
+    # Create an indentation
+
+    pdf.cell(0, 10, '', 0, 1)
+    for rank, count in reconciliation_count.items():
+        pdf.cell(0, 10, f'Rank {rank}: {count} times', 0, 1)
+    pdf.ln(10)  # Add a line break
+    
+    # Add subheader for log extraction
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(0, 10, 'Log Extracted', 0, 1)
     pdf.ln(10)  # Add a line break
@@ -109,11 +123,14 @@ def save_scrolledtext_to_file(output_text_widget, filename, tk):
     pdf.set_font("Times", size=12)
 
     # Add the text to the PDF
+    pdf.cell(0, 10, txt='------ Start of logs ----------', ln=1)
     for line in full_text.split('\n'):
         pdf.multi_cell(0, 10, txt=line)
-
+    pdf.cell(0, 10, txt='------ End of logs ----------', ln=1)
+    # Save the PDF
     pdf.output(file_path)
 
     print(f"PDF file saved to {file_path}")
 
+    # Open the PDF in a web browser
     webbrowser.open_new(file_path)
