@@ -1,8 +1,6 @@
 from gui import create_gui
 from socket_client import start_socket
 from db_queue_manager import DBQueueManager
-from test_flask import run_flask
-from threading import Thread
 from directory import monitor_dir, dest_dir
 
 

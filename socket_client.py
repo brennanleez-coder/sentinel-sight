@@ -44,7 +44,7 @@ def process_apk(data=None):
     
     if gui_output_text_callback is not None and data is not None:
 
-        # pass apk info to gui
+        # Pass apk info to gui
         get_apk_info(data)
 
         gui_output_text_callback("Processing retrieved apk...\n")
@@ -65,7 +65,6 @@ def process_apk(data=None):
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # gui_output_text_callback(f"CHECK IF RECORD EXISTS: {check_if_record_exists(conn, apk_info['package_name'], apk_info['version_code'])}")
 
         # If record does not exist in hash_checks_table, insert into table
         if not check_if_record_exists(conn, apk_info['package_name'], apk_info['version_code']):
@@ -101,8 +100,8 @@ def evaluate_apk(apk_info, get_apk_info, conn, cursor):
                 incoming_permissions=apk_info['permissions'],
                 downloaded_permissions=downloaded_permissions
             )
-        print(apk_info['permissions'])
-        print(downloaded_permissions)
+        # print(apk_info['permissions'])
+        # print(downloaded_permissions)
             
             # update hash_checks_table downloaded fields
         query = """

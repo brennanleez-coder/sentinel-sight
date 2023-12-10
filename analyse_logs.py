@@ -2,15 +2,15 @@
 def analyze_log_text(text):
     # Dictionary to hold the count of each phrase
     phrases_mapping = {
-        "APK Received": "Total APK Received",
-        "awaiting downloaded APK": "Awaiting Downloaded APK",
-        "APK check": "Total APK Checked",
+        # "APK Received": "Total APK Received",
+        # "awaiting downloaded APK": "Awaiting Downloaded APK",
+        # "APK check": "Total APK Checked",
     }
 
     phrases_to_count = {
-        "Total APK Received": 0,
-        "Awaiting Downloaded APK": 0,
-        "Total APK Checked": 0,
+        # "Total APK Received": 0,
+        # "Awaiting Downloaded APK": 0,
+        # "Total APK Checked": 0,
     }
     # Initialize reconciliation count
     reconciliation_count = {}
