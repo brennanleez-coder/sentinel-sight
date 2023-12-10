@@ -91,6 +91,10 @@ def evaluate_apk(apk_info, get_apk_info, conn, cursor):
         downloaded_hash = result[1]
         downloaded_app_cert_hash = result[2]
         downloaded_permissions = result[3]
+
+        print(f"incominga_app_cert_hash: {apk_info['app_cert_hash']}")
+        print(f"downloaded_app_cert_hash: {downloaded_app_cert_hash}")
+        print(apk_info['app_cert_hash'] == downloaded_app_cert_hash)
             
         apk_legitimacy = determine_apk_legitimacy(
                 incoming_apk_hash=apk_info['apk_hash'],
@@ -100,6 +104,7 @@ def evaluate_apk(apk_info, get_apk_info, conn, cursor):
                 incoming_permissions=apk_info['permissions'],
                 downloaded_permissions=downloaded_permissions
             )
+        
         # print(apk_info['permissions'])
         # print(downloaded_permissions)
             

@@ -32,11 +32,11 @@ def determine_apk_legitimacy(incoming_apk_hash, downloaded_apk_hash, incoming_ap
         return HashResult.DIFF_PSACHAH.value
     elif not is_same_app_cert_hash and is_same_app_hash and is_same_permissions:
         return HashResult.DIFF_ACHAHSP.value
-    elif not is_same_permissions and is_same_app_hash:
-        return HashResult.DIFF_PAHSACH.value
-    elif not is_same_permissions and is_same_app_cert_hash:
+    elif not is_same_permissions and is_same_app_hash and not is_same_app_cert_hash:  # Updated condition for Rank 5
         return HashResult.DIFF_PACHSAH.value
-    elif not is_same_app_hash and is_same_permissions:
+    elif not is_same_permissions and is_same_app_cert_hash and not is_same_app_hash:
+        return HashResult.DIFF_PAHSACH.value
+    elif not is_same_app_hash and is_same_permissions and not is_same_app_cert_hash:
         return HashResult.DIFF_AHPSACH.value
     else:
         return HashResult.DIFF_ACHPAH.value
